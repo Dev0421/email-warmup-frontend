@@ -9,11 +9,14 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const handleHomeClick = () => {
-    navigate('/dashboard'); // Navigate to the /dashboard route
+    navigate('/dashboard'); 
   };
 
   const handleEmailClick = () => {
-    navigate('/email_template'); // Navigate to the /email_template route
+    navigate('/email_template'); 
+  };
+  const handleRecord = () => {
+    navigate('/record'); 
   };
 
   // Function to toggle the sidebar
@@ -73,6 +76,9 @@ const Sidebar = () => {
           </ListItem>
           <ListItem button onClick={handleEmailClick} sx={{ userSelect: 'none' }}>
             <ListItemText primary="Email Template" />
+          </ListItem>
+          <ListItem button onClick={handleRecord} sx={{ userSelect: 'none' }}>
+            <ListItemText primary="Records" />
           </ListItem>
         </List>
       </Drawer>

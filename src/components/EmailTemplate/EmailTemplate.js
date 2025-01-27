@@ -117,6 +117,17 @@ export default function EmailTemplate() {
 
   return (
     <>
+    <Card>
+    <Box display="flex" justifyContent="center">
+      <Typography variant="h2" gutterBottom>
+        Email Templates
+      </Typography>
+    </Box>
+    <Box display="flex" justifyContent="center">
+      <Typography variant="h6" gutterBottom>
+        On this page you can create, edit and delete email templates.
+      </Typography>
+    </Box>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -231,13 +242,13 @@ export default function EmailTemplate() {
                 {template.subject}
               </Typography>
                 <Typography variant="body2" sx={{
-  display: '-webkit-box',
-  WebkitLineClamp: 5,            /* Limit to 3 lines */
-  WebkitBoxOrient: 'vertical',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  fontSize: '14px'
-}} >
+                  display: '-webkit-box',
+                  WebkitLineClamp: 5,            /* Limit to 3 lines */
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  fontSize: '14px'
+                }} >
                   {template.content}
                 </Typography>
               </CardContent>
@@ -273,6 +284,7 @@ export default function EmailTemplate() {
         </Grid>
       </Grid>
     </Box>
+    </Card>
     </>
     
   );
