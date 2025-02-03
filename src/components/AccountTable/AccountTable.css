@@ -1,0 +1,15 @@
+.provider {
+  font-family: Arial, sans-serif; /* Change to your desired font family */
+  outline: 2px solid #FF8E53; /* Outline with a specific color */
+  color: #FE6B8B; /* Text color */
+  padding: 8px; /* Padding for better appearance */
+  border-radius: 4px; /* Rounded corners */
+  display: inline-block; /* Inline-block to fit content */
+  margin: 4px 0; /* Margin for spacing */
+}
+.tablecell{
+  font-family: 'Questrial';
+  text-align: 'center';
+  color: '#ab0000';
+  font-weight: 'bold';
+}

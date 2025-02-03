@@ -1,28 +1,106 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Dialog, DialogActions, InputLabel, Select, MenuItem, FormControl, DialogContent, DialogTitle, TextField, 
+import { styled } from '@mui/system';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { Dialog, InputAdornment,IconButton, DialogActions, InputLabel, Select, MenuItem, FormControl, DialogContent, DialogTitle, TextField, 
   LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,  Slider, Typography } from '@mui/material';
-import FirstButton from '../Buttons/FirstButton';
-import SecondButton from '../Buttons/SecondButton'; 
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import ColorfulButton from '../Buttons/ColorfulButton';
+import ColorfulButton2 from '../Buttons/ColorfulButton2';
+import Switch from '@mui/material/Switch';
+import './AccountTable.css';
+const label = { inputProps: { 'aria-label': 'Color switch demo' } };
 
+const StyledTableContainer = styled(TableContainer)({
+  background: 'rgba(255, 255, 255, 0.4)', // Transparent background
+  backdropFilter: 'blur(10px)', // Blur effect
+  borderRadius: '10px', // Rounded corners
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+});
+const StyledTableCell = styled(TableCell)({
+  fontFamily: 'Questrial',
+  textAlign: 'center',
+  color: '#ab0000', // White text color
+  fontWeight: 'bold', // Bold text
+});
+const StyledTableCellTitle = styled(TableCell)({
+  textAlign: 'center',
+  fontSize: '1em',
+  color: '#1f006b',
+});
+
+const StyledTableRow = styled(TableRow)({
+  '&:nth-of-type(odd)': {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)', // Slightly different background for odd rows
+  },
+});
+const StyledSlider = styled(Slider)({
+  color: '#2196F3', // Primary color
+  height: 8,
+  '& .MuiSlider-track': {
+    border: 'none',
+  },
+  '& .MuiSlider-thumb': {
+    height: 24,
+    width: 24,
+    backgroundColor: '#fff',
+    border: '2px solid currentColor',
+    '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+      boxShadow: 'inherit',
+    },
+    '&:before': {
+      display: 'none',
+    },
+  },
+  '& .MuiSlider-valueLabel': {
+    lineHeight: 1.2,
+    fontSize: 12,
+    background: 'unset',
+    padding: 0,
+    width: 32,
+    height: 32,
+    borderRadius: '50% 50% 50% 0',
+    backgroundColor: '#2196F3',
+    transformOrigin: 'bottom left',
+    transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
+    '&:before': { display: 'none' },
+    '&.MuiSlider-valueLabelOpen': {
+      transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
+    },
+    '& > *': {
+      transform: 'rotate(45deg)',
+    },
+  },
+});
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const googleAppId = "433901800272-ed3vor0abhskftoe7d77e77kj6d3ahuu.apps.googleusercontent.com";
 
 function AccountTable() {
   const [accounts, setAccounts] = useState([]);
-  const [addtype, setAddType] = useState("1");
+  const [addtype, setAddType] = useState("3");
   const [loading, setLoading] = useState(true);
   const [dialoguetitle, setDialogueTitle] = useState("");
   const [errorMessage, setErrorMessage] = useState('');
   const [warmstage, setWarmStage] = useState(1)
   const [open, setOpen] = useState(false); // Controls the dialog visibility
   const [progress, setProgress] = useState(0); // Progress bar value
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
   const [formData, setFormData] = useState({
     id:0,
     email: '',
     password: '',
     daily_limit: 0,
-    provider: 1,
+    provider: 3,
     provider_name: 'Google Workspace',
     smtp_port: 587,
     imap_port: 993,
@@ -30,8 +108,7 @@ function AccountTable() {
     smtp_server: 'smtp.gmail.com',
     warmup_style: 1,
     status: 1
-  });
-
+  });  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => {
@@ -49,7 +126,6 @@ function AccountTable() {
         } else if (value === '3') {
           providerName = 'SMTP';
         }
-  
         updatedFormData.provider_name = providerName;
       }
       return updatedFormData;
@@ -60,9 +136,9 @@ function AccountTable() {
       setFormData({
           ...formData,
           warmup_style: newValue,
+          daily_limit: (newValue === 1 ? 50 : (newValue === 2 ? 100 : (newValue === 3 ? 500 : (newValue === 4 ? 1000 : 3000)))),
       });
   };
-
   const handleCreateNew = () => {
     setDialogueTitle("add");
     setFormData({
@@ -70,19 +146,27 @@ function AccountTable() {
       email: '',
       password: '',
       daily_limit: 100,
-      provider: "1",
-      provider_name: 'Google Workspace',
-      smtp_port: 1,
-      imap_port: 1,
+      provider: "3",
+      provider_name: 'SMTP',
+      smtp_port: 465,
+      imap_port: 993,
       imap_server: '',
       smtp_server: '',
       warmup_style: 1,
-      status: 0
+      status: 1
   })
+  console.log("new Account", formData);
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
+  };
+  const renderStars = (warmupStyle) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(i <= warmupStyle ? <StarIcon key={i} style={{ color: '#ffbf00' }} /> : <StarBorderIcon key={i} style={{ color: '#bababa' }} />);
+    }
+    return stars;
   };
   const handleSubmit = async () => {
     try {
@@ -91,7 +175,8 @@ function AccountTable() {
         console.log("new FormData", formData);
         if(formData.provider_name === "SMTP"){
           const response = await axios.post(`${apiUrl}/api/account/create/smtp`, formData); // Change to your actual API endpoint
-          setAccounts(response.data);}
+          setAccounts(response.data);
+        }
         else {
           const response = await axios.post(`${apiUrl}/api/account/create`, formData); // Change to your actual API endpoint
           setAccounts(response.data);
@@ -104,11 +189,11 @@ function AccountTable() {
         setAccounts(response.data);
         setLoading(false);
       }
-      setOpen(false); // Close the dialog after success
+      setOpen(false);
     } catch (error) {
       console.error('Error updating account:', error);
       setLoading(false);
-    }
+    }  
   };
   const handleWarming = async (email) => {
     console.log("warming Email", email);
@@ -124,16 +209,21 @@ function AccountTable() {
     setDialogueTitle("edit");
     try {
       const response = await axios.get(`${apiUrl}/api/account/getone/${id}`,);
+      const provider_response = await axios.get(`${apiUrl}/api/getprovider/${response.data.provider}`);
       setFormData({
         id: response.data.id,
         email: response.data.email,
         password: response.data.password,
         appword: response.data.app_password, 
         provider: response.data.provider,
+        provider_name: provider_response.data.provider_name, // Add provider_name here
+        smtp_port: provider_response.data.smtp_port, // Add smtp_port here
+        imap_port: provider_response.data.imap_port, // Add imap_port here
+        imap_server: provider_response.data.imap_server, // Add imap_server here
+        smtp_server: provider_response.data.smtp_server, // Add smtp_server here
         warmup_style: response.data.warmup_style,
         status: response.data.status
       });
-      
       // Open the modal or set the state as necessary
       setOpen(true);
     } catch (error) {
@@ -173,24 +263,38 @@ function AccountTable() {
   }
   return (
     <>
-    <div>
-      <FirstButton variant="contained" color="success" onClick={handleCreateNew}>
+    <div style={{ margin: '20px 0' }}>
+      <ColorfulButton size="small" onClick={handleCreateNew}>
         + Add Account
-      </FirstButton>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
+      </ColorfulButton>
+    </div>
+      <Dialog open={open} onClose={handleClose}
+      BackdropProps={{
+        style: {
+          backdropFilter: 'blur(5px)', // Blur effect for the backdrop
+          backgroundColor: 'rgba(128, 128, 128, 0.34)', // Semi-transparent dark background
+        },
+      }}
+      >
+        <DialogTitle style={{
+        background: 'linear-gradient(45deg, rgb(255 178 178) 30%, rgb(255 240 217) 90%)' 
+      }}>
           {dialoguetitle == "add" ? "Add New Account" : "Edit Account"}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent style={{
+            padding: '10px 50px',
+        background: 'linear-gradient(45deg, rgb(208 242 255) 30%, rgb(255 237 207) 90%)' 
+      }}>
         <FormControl fullWidth margin="normal">
             <InputLabel id="provider-label">Provider</InputLabel>
             <Select
               labelId="provider-label"
               id="provider"
               name="provider"
-              value={formData.provider}
+              value={parseInt(formData.provider)>2?"3":formData.provider}
               onChange={handleInputChange}
               label="Provider"
+              disabled
             >
               <MenuItem value="1">Google Workspace</MenuItem>
               <MenuItem value="2">Office 365</MenuItem>
@@ -209,16 +313,29 @@ function AccountTable() {
               disabled={dialoguetitle === "edit"}
             />
             <TextField
-              required
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-            />
-            {addtype === "1" ? (
+            required
+            label="Password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+            {formData.provider === "1" ? (
               <div id="google_workspace">
                 <TextField
                   id="filled-read-only-input"
@@ -238,7 +355,7 @@ function AccountTable() {
               </div>
             ) : null}
             
-            {addtype === "3" ? (
+            {parseInt(formData.provider) > 2 ? (
                 <div id="smtp">
                   <TextField
                     required
@@ -282,31 +399,29 @@ function AccountTable() {
                   />
                 </div>
               ) : null}
-            
-              
             <div>
             <Typography gutterBottom>Warming Up Stage</Typography>
-            <Slider
+            <StyledSlider
             value={formData.warmup_style}
             onChange={handleSliderChange}
-            min={0}
+            min={1}
             max={5}  // Set the range for the daily limit
             step={1}  // Step size for slider
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => {
               switch (value) {
                 case 1:
-                  return '50 emails';
+                  return '50';
                 case 2:
-                  return '100 emails';
+                  return '100';
                 case 3:
-                  return '500 emails';
+                  return '500';
                 case 4:
-                  return '1000 emails';
+                  return '1000';
                 case 5:
-                  return '3000 emails';
+                  return '3000';
                 default:
-                  return `${value} emails`;  // Fallback for other values
+                  return `${value}`;  // Fallback for other values
               }
             }}  // Custom value formatting
             valueLabelPosition="top"
@@ -315,67 +430,64 @@ function AccountTable() {
         </div>
           {loading && <LinearProgress variant="determinate" value={progress} />}
         </DialogContent>
-        <DialogActions>
-          <FirstButton onClick={handleClose} color="secondary">
+        <DialogActions style={{
+        background: 'linear-gradient(45deg, rgb(204 255 255) 30%, rgb(234 217 255) 90%)' 
+      }}>
+          <ColorfulButton2 onClick={handleClose} color="secondary">
             Cancel
-          </FirstButton>
+          </ColorfulButton2>
           {dialoguetitle == "add" ? (
-            <FirstButton onClick={handleSubmit} color="primary" disabled={loading} id="btn_add">
+            <ColorfulButton onClick={handleSubmit} color="primary" disabled={loading} id="btn_add">
             Add
-          </FirstButton>
+          </ColorfulButton>
             ): (
               <>
-              <FirstButton onClick={handleSubmit} color="primary" disabled={loading} id="btn_edit">
+              <ColorfulButton onClick={handleSubmit} color="primary" disabled={loading} id="btn_edit">
             Update
-          </FirstButton>
-          <SecondButton onClick={() => handleDelete(formData.id)}>Delete</SecondButton>
+          </ColorfulButton>
+          <ColorfulButton2 onClick={() => handleDelete(formData.id)}>Delete</ColorfulButton2>
           </>
             )}
         </DialogActions>
       </Dialog>
-    </div>
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Warmup Style</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Progress</TableCell>
-            <TableCell>Edit/Delete</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-        {accounts.map((account, index) => (
-        <TableRow key={index}>
-          <TableCell>{index + 1}</TableCell>
-          <TableCell>{account.email}</TableCell>
-          <TableCell>{account.warmup_style}</TableCell>
-          <TableCell>
-            {account.status === 0 ? (
-              <FirstButton onClick={() => handleWarming(account.email)}>Warm</FirstButton>
-            ) : (
-              <SecondButton onClick={() => handleWarming(account.email)}>Stop</SecondButton>
-            )}
-          </TableCell>
-          <TableCell>
-            {account.sent}/{account.received}
-            {account.status ? (
-                <LinearProgress color="secondary" />
-              ) : (
-                <LinearProgress variant="determinate" value={100} color="warning" />
-              )}
-          </TableCell>
-          <TableCell>
-            <FirstButton onClick={() => handleEdit(account.id)}>Edit</FirstButton>
-          </TableCell>
-        </TableRow>
-      ))}
-
-        </TableBody>
-      </Table>
-    </TableContainer>
+    
+      <StyledTableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <StyledTableCellTitle>ID</StyledTableCellTitle>
+              <StyledTableCellTitle>Email</StyledTableCellTitle>
+              <StyledTableCellTitle>Type</StyledTableCellTitle>
+              <StyledTableCellTitle>ESP</StyledTableCellTitle>
+              <StyledTableCellTitle>WarmUp Stage</StyledTableCellTitle>
+              <StyledTableCellTitle>Edit/Delete</StyledTableCellTitle>
+              <StyledTableCellTitle>Status</StyledTableCellTitle>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {accounts.map((account, index) => (
+              <StyledTableRow key={index}>
+                <StyledTableCell>{index + 1}</StyledTableCell>
+                <StyledTableCell>{account.email}</StyledTableCell>
+                <StyledTableCell>
+                  <div className='provider'>
+                  {account.provider === 1 ? "Google WorkSpace":(account.provider === 2 ? "Microsoft 365": "SMTP")}
+                  </div></StyledTableCell>
+                <StyledTableCell>{account.daily_limit}</StyledTableCell>
+                <StyledTableCell>
+                    {renderStars(account.warmup_style)}
+                </StyledTableCell>
+                <StyledTableCell>
+                  <ColorfulButton onClick={() => handleEdit(account.id)}>Edit</ColorfulButton>
+                </StyledTableCell>
+                <StyledTableCell>
+                  <Switch {...label} checked={account.status} color="warning" onChange={()=>handleWarming(account.email)}/>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </StyledTableContainer>
     </>
   );
 }

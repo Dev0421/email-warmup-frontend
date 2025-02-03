@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
 import { Grid } from '@mui/material';
 import axios from 'axios';
 import { Dialog, DialogActions, InputLabel, Select, MenuItem, FormControl, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
-import FirstButton from '../Buttons/FirstButton';
-import SecondButton from '../Buttons/SecondButton'; 
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-
+import { styled } from '@mui/system';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,  Slider} from '@mui/material';
+import ColorfulButton from '../Buttons/ColorfulButton';
+import ColorfulButton2 from '../Buttons/ColorfulButton2';
+import './EmailTemplate.css';
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 export default function EmailTemplate() {
@@ -23,9 +20,34 @@ export default function EmailTemplate() {
   const [formData, setFormData] = useState({
       id: 0,
       subject: '',
-      content: '',
+      body: '',
       language: ''
     });
+    
+const StyledTableContainer = styled(TableContainer)({
+  background: 'rgba(255, 255, 255, 0.4)', // Transparent background
+  backdropFilter: 'blur(10px)', // Blur effect
+  borderRadius: '10px', // Rounded corners
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+});
+const StyledTableCell = styled(TableCell)({
+  fontSize:'1em',
+  fontFamily: 'Questrial',
+  textAlign: 'center',
+  color: '#ab0000', // White text color
+  fontWeight: 'bold', // Bold text
+});
+const StyledTableCellTitle = styled(TableCell)({
+  textAlign: 'center',
+  fontSize: '1em',
+  color: '#1f006b',
+});
+
+const StyledTableRow = styled(TableRow)({
+  '&:nth-of-type(odd)': {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)', // Slightly different background for odd rows
+  },
+});
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
@@ -71,7 +93,9 @@ export default function EmailTemplate() {
   };
   const handleEdit = async (id) => {
     try {
+      console.log(formData);
       const response = await axios.post(`${apiUrl}/api/template/edit/${id}`, formData);
+      console.log(response.data )
       setTemplates(response.data);
       setOpen(false);
     } catch (error) {
@@ -93,7 +117,7 @@ export default function EmailTemplate() {
     setFormData({
       id: template.id,
       subject: template.subject,
-      content: template.content,
+      body: template.body,
       language: template.language
     });
     setOpen(true);
@@ -103,7 +127,7 @@ export default function EmailTemplate() {
   setFormData({
       id:0,
       subject: '',
-      content: '',
+      body: '',
       language: "English",
     })
   }
@@ -116,19 +140,50 @@ export default function EmailTemplate() {
   }
 
   return (
-    <>
-    <Card>
-    <Box display="flex" justifyContent="center">
-      <Typography variant="h2" gutterBottom>
-        Email Templates
-      </Typography>
-    </Box>
-    <Box display="flex" justifyContent="center">
-      <Typography variant="h6" gutterBottom>
-        On this page you can create, edit and delete email templates.
-      </Typography>
-    </Box>
-      <Dialog
+    <div style={{padding: '5em 3em'}}>
+        <div style={{ margin: '20px 0' }}>
+          <ColorfulButton2 size="small" onClick={handleCreateNew}>
+            + Add Template
+          </ColorfulButton2>
+    </div>
+    <StyledTableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <StyledTableCellTitle>ID</StyledTableCellTitle>
+                  <StyledTableCellTitle>Subject</StyledTableCellTitle>
+                  <StyledTableCellTitle>Content</StyledTableCellTitle>
+                  <StyledTableCellTitle>Edit</StyledTableCellTitle>
+                </TableRow>
+                </TableHead>
+              <TableBody>
+                {templates.map((template, index) => (
+                  <StyledTableRow key={index}>
+                    <StyledTableCell>{index + 1}</StyledTableCell>
+                    <StyledTableCell>{template.subject}</StyledTableCell>
+                    <StyledTableCell  ><div className="show2">{template.body}</div></StyledTableCell>
+                    <StyledTableCell> 
+                  <IconButton
+                    color="primary"
+                    sx={{ padding: 1 }}
+                    onClick={() => handleDetailsClick(template)}
+                  >
+                    <InfoIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    sx={{ padding: 1 }}
+                    onClick={() => handleDelete(template.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton></StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+
+          <Dialog
         open={open}
         onClose={handleClose}
         sx={{
@@ -137,11 +192,22 @@ export default function EmailTemplate() {
             minWidth: '800px',
           }
         }}
+        BackdropProps={{
+          style: {
+            backdropFilter: 'blur(5px)', // Blur effect for the backdrop
+            backgroundColor: 'rgba(128, 128, 128, 0.34)', // Semi-transparent dark background
+          },
+        }}
       >
-            <DialogTitle>
+          <DialogTitle style={{
+        background: 'linear-gradient(45deg, rgb(255 178 178) 30%, rgb(255 240 217) 90%)' 
+      }}> 
           Email Template
         </DialogTitle>
-        <DialogContent>
+        <DialogContent style={{
+            padding: '10px 50px',
+        background: 'linear-gradient(45deg, rgb(208 242 255) 30%, rgb(255 237 207) 90%)' 
+      }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={9}>
             <TextField
@@ -174,118 +240,35 @@ export default function EmailTemplate() {
           </Grid>
         </Grid>
             <TextField
+              value={formData.body}
               required
               label="Content"
-              name="content"
+              name="body"
               type="text"
-              value={formData.content}
               onChange={handleInputChange}
               fullWidth
               margin="normal"
               multiline
-              rows={4}  // You can adjust the number of rows as needed
+              rows={10}
             />
         </DialogContent>
-        <DialogActions>
-          <FirstButton onClick={handleClose} color="secondary">
+        <DialogActions  style={{
+        background: 'linear-gradient(45deg, rgb(204 255 255) 30%, rgb(234 217 255) 90%)' 
+      }}>
+          <ColorfulButton2 onClick={handleClose} color="secondary">
             Cancel
-          </FirstButton>
+          </ColorfulButton2>
             {formData.id == 0? 
-            <FirstButton onClick={() => handleSubmit(formData.id)} color="primary" disabled={loading} id="btn_edit">
+            <ColorfulButton onClick={() => handleSubmit(formData.id)} color="primary" disabled={loading} id="btn_edit">
             OK
-          </FirstButton>
-          :<FirstButton onClick={() => handleEdit(formData.id)} color="primary" disabled={loading} id="btn_edit">
+          </ColorfulButton>
+          :<ColorfulButton onClick={() => handleEdit(formData.id)} color="primary" disabled={loading} id="btn_edit">
           Update
-        </FirstButton>}
+        </ColorfulButton>}
         </DialogActions>
       </Dialog>
-    <Box sx={{ padding: 3 }}>
-      <Grid container spacing={2} justifyContent="center">
-        {templates.map((template, index) => (
-          <Grid item xs={12} sm={3} key={index}>
-            <Card sx={{ minWidth: 200, backgroundColor: '#c7deff', height: 200, position: 'relative' }}>
-            
-
-            <CardContent>
-            <Box
-            sx={{
-              display: 'flex', // Enables flexbox for alignment
-              justifyContent: 'space-between', // Spaces out items
-              alignItems: 'center', // Vertically centers items
-              width: '100%', // Full-width container
-            }}
-                    >
-            {/* Left-aligned text */}
-            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-              Template {index + 1}
-            </Typography>
-
-                {/* Right-aligned icons */}
-                <Box>
-                  <IconButton
-                    color="primary"
-                    sx={{ padding: 1 }}
-                    onClick={() => handleDetailsClick(template)}
-                  >
-                    <InfoIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    sx={{ padding: 1 }}
-                    onClick={() => handleDelete(template.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-              <Typography variant="h5" component="div" sx={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}>
-                {template.subject}
-              </Typography>
-                <Typography variant="body2" sx={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 5,            /* Limit to 3 lines */
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontSize: '14px'
-                }} >
-                  {template.content}
-                </Typography>
-              </CardContent>
-              
-              <CardActions>
-                
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-        <Grid item xs={12} sm={3} >
-              <Card
-        sx={{
-          minWidth: 275,
-          backgroundColor: "#575757",
-          border: "dotted 2px black",
-          cursor: 'pointer', // Makes the card appear clickable
-            }}
-            onClick={handleCreateNew} // Click handler
-          >
-            <CardContent
-              sx={{
-                fontSize: '120px',
-                alignItems: 'center',
-                justifyContent: 'center',
-                display: 'flex',
-                paddingBottom: '40px',
-              }}
-            >
-              +
-            </CardContent>
-      </Card>
-        </Grid>
-      </Grid>
-    </Box>
-    </Card>
-    </>
+    
+    </div>
     
   );
 }

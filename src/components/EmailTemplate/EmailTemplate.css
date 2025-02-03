@@ -1,0 +1,8 @@
+.show2 {
+  display: -webkit-box; /* Use the old flexbox model for compatibility */
+  -webkit-line-clamp: 2; /* Limit the text to 2 lines */
+  -webkit-box-orient: vertical; /* Set the direction of the box */
+  overflow: hidden; /* Hide the overflow */
+  text-overflow: ellipsis; /* Add "..." at the end of the text */
+  white-space: normal; /* Allow text to wrap */
+}

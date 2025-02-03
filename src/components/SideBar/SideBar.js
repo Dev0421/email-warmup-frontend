@@ -1,106 +1,156 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Drawer, List, ListItem, ListItemText, AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import Container from '@mui/material/Container';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import MenuItem from '@mui/material/MenuItem';
+import AdbIcon from '@mui/icons-material/Adb';
+import avatar from '../../assets/images/avatar.png';
 
-const Sidebar = () => {
-  const [open, setOpen] = useState(false); // State to manage the sidebar's visibility
-  const sidebarRef = useRef(null); // Reference for the sidebar
+
+function ResponsiveAppBar() {
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
-
-  const handleHomeClick = () => {
-    navigate('/dashboard'); 
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
   };
 
-  const handleEmailClick = () => {
-    navigate('/email_template'); 
-  };
-  const handleRecord = () => {
-    navigate('/record'); 
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
   };
 
-  // Function to toggle the sidebar
-  const toggleSidebar = () => {
-    setOpen(!open);
+  const handleMoveToAccounts = () => {
+    setAnchorElUser(null);
+    navigate('/dashboard');
   };
-
-  // Close sidebar if clicked outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        setOpen(false); // Close sidebar when clicking outside
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    // Prevent horizontal scrollbar when sidebar is open
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside); // Cleanup the event listener
-    };
-  }, [open]);
-
+  const handleMoveToTemplates = () => {
+    setAnchorElUser(null);
+    navigate('/template');
+  };
+  const handleMoveToRecords = () => {
+    setAnchorElUser(null);
+    navigate('/record');
+  };
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={toggleSidebar}>
-            <MenuIcon />
+    <AppBar position="fixed" sx={{ background: 'linear-gradient(45deg, rgb(255 84 114) 30%, rgb(255 214 148) 90%)' }}>
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <Typography
+            variant="h6"
+            noWrap
+            component="a"
+            href="#app-bar-with-responsive-menu"
+            sx={{
+              mr: 2,
+              display: { xs: 'none', md: 'flex' },
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+          </Typography>
+
+          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
+            >
+              <MenuIcon />
             </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
+              sx={{ display: { xs: 'block', md: 'none' } }}
+            >
+              <MenuItem key="accounts" onClick={handleMoveToAccounts}>
+                <Typography sx={{ textAlign: 'center' }}>Accounts</Typography>
+              </MenuItem>
+              <MenuItem key="templates" onClick={handleMoveToTemplates}>
+                <Typography sx={{ textAlign: 'center' }}>Templates</Typography>
+              </MenuItem>
+              <MenuItem key="records" onClick={handleMoveToRecords}>
+                <Typography sx={{ textAlign: 'center' }}>Records</Typography>
+              </MenuItem>
+            </Menu>
+          </Box>
+          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+          <Typography
+            variant="h5"
+            noWrap
+            component="a"
+            href="#"
+            sx={{
+              mr: 2,
+              display: { xs: 'flex', md: 'none' },
+              flexGrow: 1,
+              fontFamily: 'Archivo',
+              fontWeight: 700,
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            Email WarmUp
+          </Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              <Button
+                key="accounts"
+                onClick={handleMoveToAccounts}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >Accounts
+              </Button>
+              <Button
+                key="templates"
+                onClick={handleMoveToTemplates}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >Templates
+              </Button>
+              <Button
+                key="records"
+                onClick={handleMoveToRecords}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >Records
+              </Button>
+          </Box>
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="Gregory Gibbons">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar alt="Remy Sharp" src={avatar} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Toolbar>
-
-      {/* Sidebar (Drawer) */}
-      <Drawer
-        ref={sidebarRef} // Attach the ref to the Drawer
-        sx={{
-          width: 240,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: 240,
-            boxSizing: 'border-box',
-            userSelect: 'none', // Disable text selection in the sidebar
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <List>
-          <ListItem button onClick={handleHomeClick} sx={{ userSelect: 'none' }}>
-            <ListItemText primary="Dashboard" />
-          </ListItem>
-          <ListItem button onClick={handleEmailClick} sx={{ userSelect: 'none' }}>
-            <ListItemText primary="Email Template" />
-          </ListItem>
-          <ListItem button onClick={handleRecord} sx={{ userSelect: 'none' }}>
-            <ListItemText primary="Records" />
-          </ListItem>
-        </List>
-      </Drawer>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          bgcolor: 'background.default',
-          padding: 3,
-          marginLeft: open ? 240 : 0, // Shift content when sidebar is open
-          transition: 'margin-left 0.3s ease',
-        }}
-      >
-      </Box>
-    </Box>
+      </Container>
+    </AppBar>
   );
-};
-
-export default Sidebar;
-
-
-
-
-
-
+}
+export default ResponsiveAppBar;
